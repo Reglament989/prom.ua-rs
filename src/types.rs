@@ -116,3 +116,86 @@ pub struct PromSaveDeclarationIdResponse {
     pub message: Option<String>,
     pub errors: Option<HashMap<String, String>>,
 }
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromOrderRefundRequest {
+    pub ids: Vec<i32>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromOrderRefundResponse {
+    pub processed_ids: Vec<i32>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromClientListResponse {
+    pub clients: Vec<PromClientCard>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromClientByIdResponse {
+    pub client: PromClientCard,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromClientCard {
+    pub id: i32,
+    pub client_full_name: String,
+    pub phones: Vec<String>,
+    pub emails: Vec<String>,
+    pub comment: Option<String>,
+    pub orders_count: i32,
+    pub total_payout: String,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromMessagesListResponse {
+    pub messages: Vec<PromMessage>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromMessageByIdResponse {
+    pub message: PromMessage,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Deserialize, Serialize, Debug)]
+pub enum PromMessageStatus {
+    unread,
+    read,
+    deleted,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromSetStatusMessageRequest {
+    pub ids: Vec<i32>,
+    pub status: PromMessageStatus,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromSetStatusMessageResponse {
+    pub processed_ids: Vec<i32>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromMessageReplyRequest {
+    pub id: i32,
+    pub message: String,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromMessageReplyResponse {
+    pub processed_id: i32,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PromMessage {
+    pub id: i32,
+    pub client_full_name: String,
+    pub date_created: String,
+    pub phone: String,
+    pub message: String,
+    pub subject: String,
+    pub status: String,
+    pub product_id: String,
+}

@@ -3,10 +3,7 @@ use std::env;
 use reqwest::{header, Client};
 use types::{PromOrderStatus, PromOrdersResponse};
 
-use crate::types::{
-    PromChangeStatusRequest, PromChangeStatusResponse, PromOrderByIdResponse,
-    PromSaveDeclarationIdRequest,
-};
+use crate::types::*;
 
 mod types;
 
@@ -91,6 +88,23 @@ impl Prom {
         Ok(response)
     }
 
+    pub async fn order_refund(
+        &self,
+        ids: Vec<i32>,
+    ) -> Result<PromOrderRefundResponse, Box<dyn std::error::Error>> {
+        let payload = PromOrderRefundRequest { ids };
+        let response = self
+            .client
+            .post(format!("{}/orders/refund", BASE_URL))
+            .json(&payload)
+            .send()
+            .await?
+            .json::<PromOrderRefundResponse>()
+            .await?;
+
+        Ok(response)
+    }
+
     pub async fn save_declaration_id(
         &self,
         order_id: i32,
@@ -109,6 +123,120 @@ impl Prom {
             .send()
             .await?
             .json::<PromOrderByIdResponse>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn get_clients(
+        &self,
+        limit: Option<i32>,
+        last_id: Option<i32>,
+        search_term: Option<String>,
+    ) -> Result<PromClientListResponse, Box<dyn std::error::Error>> {
+        let response = self
+            .client
+            .get(format!("{}/clients/list", BASE_URL))
+            .query(&[
+                ("limit", limit.or(Some(0)).unwrap().to_string()),
+                ("last_id", last_id.or(Some(0)).unwrap().to_string()),
+                ("search_term", search_term.or(Some("".to_string())).unwrap()),
+            ])
+            .send()
+            .await?
+            .json::<PromClientListResponse>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn get_client_by_id(
+        &self,
+        id: String,
+    ) -> Result<PromClientByIdResponse, Box<dyn std::error::Error>> {
+        let response = self
+            .client
+            .get(format!("{}/clients/{}", BASE_URL, id))
+            .send()
+            .await?
+            .json::<PromClientByIdResponse>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn get_messages(
+        &self,
+        status: Option<String>,
+        date_from: Option<String>,
+        date_to: Option<String>,
+        limit: Option<i32>,
+        last_id: Option<i32>,
+    ) -> Result<PromMessagesListResponse, Box<dyn std::error::Error>> {
+        let response = self
+            .client
+            .get(format!("{}/messages/list", BASE_URL))
+            .query(&[
+                ("status", status.or(Some("".to_string())).unwrap()),
+                ("date_from", date_from.or(Some("".to_string())).unwrap()),
+                ("date_to", date_to.or(Some("".to_string())).unwrap()),
+                ("limit", limit.or(Some(0)).unwrap().to_string()),
+                ("last_id", last_id.or(Some(0)).unwrap().to_string()),
+            ])
+            .send()
+            .await?
+            .json::<PromMessagesListResponse>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn get_message_by_id(
+        &self,
+        id: String,
+    ) -> Result<PromMessageByIdResponse, Box<dyn std::error::Error>> {
+        let response = self
+            .client
+            .get(format!("{}/messages/{}", BASE_URL, id))
+            .send()
+            .await?
+            .json::<PromMessageByIdResponse>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn set_message_status(
+        &self,
+        ids: Vec<i32>,
+        status: PromMessageStatus,
+    ) -> Result<PromSetStatusMessageResponse, Box<dyn std::error::Error>> {
+        let payload = PromSetStatusMessageRequest { ids, status };
+        let response = self
+            .client
+            .post(format!("{}/messages/set_status", BASE_URL))
+            .json(&payload)
+            .send()
+            .await?
+            .json::<PromSetStatusMessageResponse>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn reply_to_message(
+        &self,
+        id: i32,
+        message: String,
+    ) -> Result<PromMessageReplyResponse, Box<dyn std::error::Error>> {
+        let payload = PromMessageReplyRequest { id, message };
+        let response = self
+            .client
+            .post(format!("{}/messages/reply", BASE_URL))
+            .json(&payload)
+            .send()
+            .await?
+            .json::<PromMessageReplyResponse>()
             .await?;
 
         Ok(response)
