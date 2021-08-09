@@ -1,5 +1,5 @@
 [package]
-name = "prom_ua-rs"
+name = "prom_ua"
 version = "0.1.0"
 edition = "2018"
 
